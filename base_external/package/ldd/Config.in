@@ -1,0 +1,5 @@
+
+config BR2_PACKAGE_LDD
+	bool "lld"
+	help
+	  Includes the material for assignment 7
