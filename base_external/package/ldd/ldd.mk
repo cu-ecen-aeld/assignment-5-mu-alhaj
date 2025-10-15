@@ -21,5 +21,14 @@ define LDD_INSTALL_TARGET_CMDS
 	$(HOST_DIR)/sbin/depmod -a -b $(TARGET_DIR) $(LINUX_VERSION_PROBED)
 endef
 
+define LDD_POST_BUILD
+	$(INSTALL) -m 0755 $(@D)/scull/scull_load $(TARGET_DIR)/usr/bin
+	$(INSTALL) -m 0755 $(@D)/scull/scull_unload $(TARGET_DIR)/usr/bin
+	$(INSTALL) -m 0755 $(@D)/misc-modules/module_load $(TARGET_DIR)/usr/bin
+	$(INSTALL) -m 0755 $(@D)/misc-modules/module_unload $(TARGET_DIR)/usr/bin
+endef
+
+LDD_POST_BUILD_HOOKS += LDD_POST_BUILD
+
 $(eval $(kernel-module))
 $(eval $(generic-package))
