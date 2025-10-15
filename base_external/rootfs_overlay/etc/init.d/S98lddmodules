@@ -1,18 +1,34 @@
- #!/bin/sh
+#!/bin/sh
+# Load or unload LDD modules at boot
+# Uses helper scripts and modprobe for reliable module loading
+
+MODULES="scull faulty hello"
 
 case "$1" in
-	start)
-		echo "Scull loading"
-		scull_load 
-		module_load faulty
-		modprobe hello.ko
-		;;
-	stop)
-		echo "Scull Unloading"
-		scull_unload
-		module_unload faulty
-		rmmod hello.ko
-		;;
-	*)
-	echo "Usage: $0 {start|stop}"
+    start)
+        echo "Loading ldd modules..."
+
+        for mod in $MODULES; do
+            echo "Loading $mod..."
+            modprobe $mod
+        done
+        ;;
+
+    stop)
+        echo "Unloading ldd modules..."
+
+        # Unload misc modules in reverse order
+        for mod in $(echo $MODULES | tac -s  ); do
+            if lsmod | grep -q "^$mod"; then
+                echo "Unloading $mod..."
+                modprobe -r $mod
+            fi
+        done
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
 esac
+

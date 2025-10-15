@@ -1,34 +1,39 @@
-
 ##############################################################
 #
-# LDD
+# LDD Package
 #
 ##############################################################
 
-#TODO: Fill up the contents below in order to reference your assignment 3 git contents
-AESD_ASSIGNMENTS_VERSION = '3e89f4889ca8a3d90bdea47c12b265d5ad9f8d71'
-# Note: Be sure to reference the *ssh* repository URL here (not https) to work properly
-# with ssh keys and the automated build/test system.
-# Your site should start with git@github.com:
-AESD_ASSIGNMENTS_SITE = 'git@github.com:cu-ecen-aeld/assignment-7-mu-alhaj.git'
-AESD_ASSIGNMENTS_SITE_METHOD = git
-AESD_ASSIGNMENTS_GIT_SUBMODULES = YES
+LDD_VERSION = 3e89f4889ca8a3d90bdea47c12b265d5ad9f8d71
+LDD_SITE = git@github.com:cu-ecen-aeld/assignment-7-mu-alhaj.git
+LDD_SITE_METHOD = git
+LDD_GIT_SUBMODULES = YES
 
-LDD_MODULE_SUBDIRS = misc-modules scull
+# Directories containing kernel modules
+LDD_MODULE_SUBDIRS = scull misc-modules
 
+# Build as kernel module package
+$(eval $(kernel-module))
 
-define LDD_INSTALL_TARGET_CMDS
-	$(HOST_DIR)/sbin/depmod -a -b $(TARGET_DIR) $(LINUX_VERSION_PROBED)
-endef
-
+# Install helper scripts and modules
 define LDD_POST_BUILD
-	$(INSTALL) -m 0755 $(@D)/scull/scull_load $(TARGET_DIR)/usr/bin
-	$(INSTALL) -m 0755 $(@D)/scull/scull_unload $(TARGET_DIR)/usr/bin
-	$(INSTALL) -m 0755 $(@D)/misc-modules/module_load $(TARGET_DIR)/usr/bin
-	$(INSTALL) -m 0755 $(@D)/misc-modules/module_unload $(TARGET_DIR)/usr/bin
+    # Install scull helpers
+    $(INSTALL) -m 0755 $(@D)/scull/scull_load $(TARGET_DIR)/usr/bin
+    $(INSTALL) -m 0755 $(@D)/scull/scull_unload $(TARGET_DIR)/usr/bin
+
+    # Install misc-module helpers
+    $(INSTALL) -m 0755 $(@D)/misc-modules/module_load $(TARGET_DIR)/usr/bin
+    $(INSTALL) -m 0755 $(@D)/misc-modules/module_unload $(TARGET_DIR)/usr/bin
+
+    # Install kernel modules into /lib/modules/<kernel-version>/
+    $(INSTALL) -m 0644 $(@D)/scull/*.ko $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/
+    $(INSTALL) -m 0644 $(@D)/misc-modules/*.ko $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/
+
+    # Update module dependencies
+    $(HOST_DIR)/sbin/depmod -a -b $(TARGET_DIR) $(LINUX_VERSION_PROBED)
 endef
 
 LDD_POST_BUILD_HOOKS += LDD_POST_BUILD
 
-$(eval $(kernel-module))
 $(eval $(generic-package))
+
