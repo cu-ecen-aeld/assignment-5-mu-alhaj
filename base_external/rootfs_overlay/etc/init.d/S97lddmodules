@@ -1,0 +1,23 @@
+#!/bin/sh
+# Load or unload LDD modules at boot
+# Uses helper scripts and modprobe for reliable module loading
+
+MODULES="faulty hello"
+
+case "$1" in
+    start)
+        echo "Loading aesdchar"
+	    /usr/bin/aesdchar_load
+        ;;
+
+    stop)
+        echo "Unloading scull"
+	    /usr/bin/aesdchar_unload
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
+

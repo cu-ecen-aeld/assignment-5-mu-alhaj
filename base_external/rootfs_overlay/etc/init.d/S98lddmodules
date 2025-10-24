@@ -7,7 +7,7 @@ MODULES="faulty hello"
 case "$1" in
     start)
         echo "Loading scull"
-	/usr/bin/scull_load
+	    /usr/bin/scull_load
 	
         echo "Loading faulty"
         /usr/bin/module_load faulty
@@ -18,13 +18,13 @@ case "$1" in
 
     stop)
         echo "Unloading scull"
-	/usr/bin/scull_unload
+	    /usr/bin/scull_unload
 
-	echo "Unloading faulty"
-	/usr/bin/module_unload faulty
+	    echo "Unloading faulty"
+	    /usr/bin/module_unload faulty
 
-	echo "Unloading scull"
-	/usr/bin/module_unload hello
+	    echo "Unloading scull"
+	    /usr/bin/module_unload hello
         ;;
 
     *)
